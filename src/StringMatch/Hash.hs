@@ -2,6 +2,7 @@ module StringMatch.Hash where
 
 -- import Data.ByteString.Char8 (ByteString)
 import Data.Char (ord)
+import Control.Parallel.Strategies (using, parList, rseq)
 
 
 -- | Modulo exponentiation, taken from https://gist.github.com/trevordixon/6788535
@@ -53,3 +54,22 @@ rollingHash pattern text = rollHashMatch text text 0 hashP 0 0 (length pattern)
     hashP = polyHash b m pattern
     (b, m) = (31, 100003)
 
+
+prollingHash :: [Char] -> [Char] -> Int -> [Int]
+prollingHash ppattern ptext pn = phelper len2 (fmap (rollingHash ppattern) partitions `using` parList rseq)
+  where
+    partitions = partition len1 len2 ptext
+    len1 = len2 + (lenp - 1)
+    len2 = (lent `div` pn)
+    lenp = length ppattern
+    lent = length ptext
+
+phelper :: Int -> [[Int]] -> [Int]
+phelper x inds = concat $ zipWith (\a b -> map (+b) a) inds lx
+  where
+    lx = map (*x) [0..]
+
+partition :: Int -> Int -> [Char] -> [[Char]]
+partition _ _ [] = []
+partition n i xs = partition' : partition n i (drop i xs)
+    where partition' = take n xs
