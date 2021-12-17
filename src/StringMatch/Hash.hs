@@ -1,4 +1,6 @@
-import Data.ByteString.Char8 (ByteString)
+module StringMatch.Hash where
+
+-- import Data.ByteString.Char8 (ByteString)
 import Data.Char (ord)
 
 

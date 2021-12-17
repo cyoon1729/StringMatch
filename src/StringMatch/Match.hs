@@ -1,3 +1,3 @@
-module Matcher () where
+module StringMatch.Match () where
 
 
