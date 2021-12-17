@@ -1,6 +1,7 @@
 module Lib
     ( someFunc
     ) where
+import StringMatch.Hash
 
 someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+someFunc = putStrLn $ unlines $ map show $ rollingHash "test" "--test-- test"
