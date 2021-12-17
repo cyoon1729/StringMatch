@@ -1,1 +1,1 @@
-module Reader () where
+module StringMatch.Reader () where
