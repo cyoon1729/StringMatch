@@ -46,19 +46,21 @@ rollHashMatch (x:xs) (y:ys) idx hashT hashC nc nw
     (b, m)   = (31, 100003)
 
 
-rollMatch text subStr hashT ws = rmGo text subStr 0 0
+-- | Cleaner Rabin-Karp rolling hash function helper that discards non-matches.
+rollMatch :: [Char] -> Int -> Int -> [(Int, [Char])]
+rollMatch text targetHash ws = rmGo text "" 0 0
   where
     rmGo [] sstr hashC idx
-      | hashT == hashC = [(idx, sstr)]
+      | targetHash == hashC = [(idx, sstr)]
       | otherwise      = []
     rmGo (x:xs) sstr hashC idx
       | length sstr < ws = rmGo xs (sstr ++ [x]) hashC' (idx + 1) 
       | isMatch          = (idx, sstr) : rmGo xs (ss ++ [x]) hashR (idx + 1)
       | otherwise        = rmGo xs (ss ++ [x]) hashR (idx + 1)
       where
-        isMatch  = nc == nw && hashT == hashC
+        isMatch  = length sstr == ws && targetHash == hashC
         hashC'   = modM $ ex + modM (hashC * b)
-        hashR    = modM $ ex + modM ((hashC - * (mExp b (ws - 1))) * b)
+        hashR    = modM $ ex + modM ((hashC - es * (mExp b (ws - 1))) * b)
         modM val = val `mod` m
         mExp p q = modExp p q m
         (s:ss)   = sstr
@@ -67,8 +69,6 @@ rollMatch text subStr hashT ws = rmGo text subStr 0 0
 
 
         
-
-
 
 -- | Rolling hash function, finds indices in `text` at which the `pattern` appears.
 rollingHash :: [Char] -> [Char] -> [Int]
