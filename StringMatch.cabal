@@ -26,6 +26,9 @@ source-repository head
 library
   exposed-modules:
       Lib
+      StringMatch.Hash
+      StringMatch.Match
+      StringMatch.Reader
   other-modules:
       Paths_StringMatch
   hs-source-dirs:
