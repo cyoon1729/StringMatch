@@ -1,33 +1,53 @@
-module Hash () where
-
 import Data.ByteString.Char8 (ByteString)
 import Data.Char (ord)
 
 
---| An inefficient but correct rolling hash function for testing
-rollHashVerify :: Int -> [Char] -> Int
-rollHashVerify winLen lst = map (polySum) $ slidingWindow winLen lst
+-- | Modulo exponentiation, taken from https://gist.github.com/trevordixon/6788535
+modExp :: Int -> Int -> Int -> Int
+modExp  x y n = mod (x^(mod y (n-1))) (n)
+
+
+-- | polynomial hash for rabin-karp hashing pattern
+polyHash b m str = foldl (\acc a -> polyMod a acc) 0 str
   where
-    polySum xs = foldl (\acc x -> (ord x) + acc * base) 0 xs 
+    polyMod a acc = modM $ (ord a) + modM (acc * b)
+    modM val      = val `mod` m
+
+
+-- | An inefficient but correct rolling hash function for testing
+rollHashVerify :: Int -> [Char] -> [Int]
+rollHashVerify winLen lst = map (polyHash b m) $ slidingWindow winLen lst
+  where
     slidingWindow _ [] = []
     slidingWindow size (x:xs)
         | length (x:xs) >= size = (take size (x:xs)) : slidingWindow size xs
         | otherwise             = []
+    (b, m) = (31, 100003) 
 
 
---| Rabin-Karp rolling hash function.
-rollHash :: [Char] -> [Char] -> Int -> Int -> Int -> [Int]
-rollHash [] _ winHash _ _ = [winHash]
-rollHash (x:xs) (y:ys) winHash currLen winLen
-    | currLen == winLen = winHash : rollHash xs ys rollWinHash currLen winLen 
-    | otherwise         = rollHash xs (y:ys) nWinHash (currLen + 1) winLen
+-- | Rabin-Karp rolling hash helper function that discards non-matches on-the-fly.
+rollHashMatch :: [Char] -> [Char] -> Int -> Int -> Int -> Int -> Int -> [Int]  -- Yuck! Disgusting!
+rollHashMatch [] _ idx hashT hashC _ _
+    | hashT == hashC = [idx]
+    | otherwise      = []
+rollHashMatch (x:xs) (y:ys) idx hashT hashC nc nw
+    | nc < nw   = rollHashMatch xs (y:ys) idx hashT hashC' (nc + 1) nw 
+    | isMatch   = idx : rollHashMatch xs ys (idx + 1) hashT hashR nc nw
+    | otherwise = rollHashMatch xs ys (idx + 1) hashT hashR nc nw
+  where 
+    isMatch  = nc == nw && hashT == hashC
+    hashC'   = modM $ ex + modM (hashC * b)
+    hashR    = modM $ ex + modM ((hashC - ey * (mExp b (nw - 1))) * b)
+    modM val = val `mod` m
+    mExp p q = modExp p q m
+    (ex, ey) = (ord x, ord y)
+    (b, m)   = (31, 100003)
+
+
+-- | Rolling hash function, finds indices in `text` at which the `pattern` appears.
+rollingHash :: [Char] -> [Char] -> [Int]
+rollingHash pattern text = rollHashMatch text text 0 hashP 0 0 (length pattern)
   where
-    nWinHash    = winHash * base + (ord x)
-    rollWinHash = (winHash - (ord y) * base^(winLen - 1)) * base + (ord x) 
-    base        = 7
-    modulo      = 0 
--- | A Rabin-Karp polynomial hash function.
-hashFn :: Int -> Int -> Char8 -> Int
-hashFN _ _ _ = 0
-
+    hashP = polyHash b m pattern
+    (b, m) = (31, 100003)
 
