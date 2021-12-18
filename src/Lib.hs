@@ -8,6 +8,7 @@ module Lib
     ) where
 
 import StringMatch.Hash
+{-
 import StringMatch.RabinKarp
     (
       rabinKarpRoll,
@@ -16,9 +17,18 @@ import StringMatch.RabinKarp
       rabinKarpOnePass,
       seqRabinKarp
     )
+-}
+import StringMatch.ParRabinKarp
+    (
+      rabinKarpRoll,
+      rabinKarpMatch,
+      rabinKarp,
+      rabinKarpOnePass,
+      parRabinKarp
+    )
 
 someFunc :: IO ()
 --someFunc = putStrLn $ unlines $ map show $ rabinKarpOnePass "test" "--test-- test"
-someFunc = seqRabinKarp
+someFunc = parRabinKarp
 
 
