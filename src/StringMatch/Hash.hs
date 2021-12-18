@@ -3,6 +3,14 @@ module StringMatch.Hash where
 -- import Data.ByteString.Char8 (ByteString)
 import Data.Char (ord)
 import Control.Parallel.Strategies (using, parList, rseq)
+import Control.Monad (forM_)
+import Data.Char (chr)
+import Data.Word (Word8)
+import Foreign.ForeignPtr (ForeignPtr, withForeignPtr)
+import Foreign.Ptr (Ptr, plusPtr)
+import Foreign.Storable (peek)
+import System.IO.MMap (Mode(ReadOnly), mmapFileForeignPtr)
+import System.Environment(getArgs)
 
 
 -- | Modulo exponentiation, taken from https://gist.github.com/trevordixon/6788535
@@ -69,7 +77,25 @@ phelper x inds = concat $ zipWith (\a b -> map (+b) a) inds lx
   where
     lx = map (*x) [0..]
 
+-- | Partitioning function without pointers
 partition :: Int -> Int -> [Char] -> [[Char]]
 partition _ _ [] = []
 partition n i xs = partition' : partition n i (drop i xs)
     where partition' = take n xs
+
+-- pointer stuff
+doStuff :: ForeignPtr Word8 -> Int -> IO ()
+doStuff fp i =
+  withForeignPtr fp $ \p -> do
+    let addr = p `plusPtr` i
+    val <- peek addr :: IO Word8
+    print $ chr $ fromIntegral val
+
+seqHash :: IO ()
+seqHash = do
+  args <- getArgs
+  (apattern, path) <- case args of
+    [apattern, path] -> return (apattern, path)
+  (p,offset,size) <- mmapFileForeignPtr path ReadOnly Nothing
+  forM_ [0 .. size-1] $ \i -> do
+    doStuff p (offset + i)
