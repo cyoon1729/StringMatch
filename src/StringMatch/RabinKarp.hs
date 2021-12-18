@@ -4,10 +4,13 @@ module StringMatch.RabinKarp
     , rabinKarpMatch
     , rabinKarp
     , rabinKarpOnePass
+    , seqRabinKarp
     )  where
 
 import qualified Data.Char as DC
 import qualified Data.List as DL
+import System.Environment(getArgs)
+import System.IO(readFile)
 
 
 -- | Modulo exponentiation, taken from https://gist.github.com/trevordixon/6788535
@@ -87,3 +90,9 @@ rabinKarpOnePass pattern text = rkRoll text "" 0 0
     ws         = length pattern
     (b, m)     = (31, 100003)
 
+seqRabinKarp :: IO ()
+seqRabinKarp = do
+  args <- getArgs
+  (pattern, path) <- case args of
+    [pattern, path] -> return (pattern, path)
+  readFile path >>= \s -> putStrLn $ unlines $ map show $ rabinKarpOnePass pattern s
