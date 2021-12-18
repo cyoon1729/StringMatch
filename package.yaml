@@ -23,6 +23,9 @@ dependencies:
 - base >= 4.7 && < 5
 - parallel
 - bytestring
+- unix
+- directory
+- deepseq
 
 library:
   source-dirs: src
@@ -35,6 +38,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -eventlog
     dependencies:
     - StringMatch
 
