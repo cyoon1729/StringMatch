@@ -28,6 +28,8 @@ library
       Lib
       StringMatch.Hash
       StringMatch.Match
+      StringMatch.ParRabinKarp
+      StringMatch.RabinKarp
       StringMatch.Reader
   other-modules:
       Paths_StringMatch
@@ -35,6 +37,11 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , bytestring
+    , deepseq
+    , directory
+    , parallel
+    , unix
   default-language: Haskell2010
 
 executable StringMatch-exe
@@ -43,10 +50,15 @@ executable StringMatch-exe
       Paths_StringMatch
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -eventlog
   build-depends:
       StringMatch
     , base >=4.7 && <5
+    , bytestring
+    , deepseq
+    , directory
+    , parallel
+    , unix
   default-language: Haskell2010
 
 test-suite StringMatch-test
@@ -60,4 +72,9 @@ test-suite StringMatch-test
   build-depends:
       StringMatch
     , base >=4.7 && <5
+    , bytestring
+    , deepseq
+    , directory
+    , parallel
+    , unix
   default-language: Haskell2010
