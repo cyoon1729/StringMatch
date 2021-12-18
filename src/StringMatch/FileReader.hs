@@ -32,7 +32,9 @@ loadChunks filePath numChunks = do
     let chunkSize   = fromIntegral $ fileSize `div` numChunks
         chunkOffset::FileOffset = (fileSize `div` numChunks) :: FileOffset
     fd <- PIO.openFd filePath PIO.ReadOnly (Just (CMode 0440)) PIO.defaultFileFlags
-    return (loadReaders (PIOB.fdPread fd chunkSize) 2 chunkOffset 0)
+    let chunkReader = PIOB.fdPread fd chunkSize
+        readers     = loadReaders chunkReader numChunks chunkOffset 0
+    return readers
 
 
 
