@@ -33,7 +33,7 @@ parRabinKarp4 pattern filePath = do
             _ <- rseq m3
             _ <- rseq m4
             return [(0, m1), (1, m2), (2, m3), (3, m4)]
-    let offsetCorrected = map (\(nChunk, idxs) -> map (nChunk+) idxs) matches
-        matchesFinal    = concat offsetCorrected
+    let offsetCorrected = map (\(nChunk, idxs) -> map ((nChunk * chunkSize)+) (map fromIntegral idxs)) matches
+        matchesFinal    = map fromIntegral $ concat offsetCorrected
     return matchesFinal
 
