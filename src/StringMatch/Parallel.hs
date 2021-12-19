@@ -14,6 +14,7 @@ import StringMatch.RabinKarp (rabinKarpRoll, rabinKarpMatch, rabinKarp)
 import StringMatch.FileReader (getFileSize, readChunk)
 
 
+parRabinKarp4 :: [Char] -> [Char] -> IO [Int]
 parRabinKarp4 pattern filePath = do
     fileSize <- getFileSize filePath
     let chunkSize   = fromIntegral (fileSize `div` 4) 
