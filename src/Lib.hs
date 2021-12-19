@@ -7,6 +7,7 @@ module Lib
     , rabinKarpOnePass
     , seqRabinKarp
     , parRabinKarp4
+    , parRabinKarp
     ) where
 
 import StringMatch.Hash
@@ -18,9 +19,11 @@ import StringMatch.RabinKarp
       rabinKarpOnePass,
       seqRabinKarp
     )
-import StringMatch.Parallel (parRabinKarp4)
+import StringMatch.Parallel
+    (
+      parRabinKarp4,
+      parRabinKarp
+    )
 
 someFunc :: IO ()
 someFunc = putStrLn $ unlines $ map show $ rollingHash "test" "--test-- test"
-
-
