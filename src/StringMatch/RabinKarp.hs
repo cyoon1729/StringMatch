@@ -4,6 +4,7 @@ module StringMatch.RabinKarp
     , rabinKarpMatch
     , rabinKarp
     , rabinKarpOnePass
+    , seqRabinKarp
     )  where
 
 
@@ -136,3 +137,8 @@ rabinKarpOnePass pattern text = rkRoll text "" 0 0
     (b, m)     = (31, 100003)
 
 
+seqRabinKarp :: [Char] -> [Char] -> IO [Int]
+seqRabinKarp pattern filePath = do
+    file <- readFile filePath
+    let matchesFinal = rabinKarpOnePass pattern file
+    return matchesFinal

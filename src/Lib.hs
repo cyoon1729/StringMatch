@@ -5,6 +5,7 @@ module Lib
     , rabinKarpMatch
     , rabinKarp
     , rabinKarpOnePass
+    , seqRabinKarp
     , parRabinKarp4
     ) where
 
@@ -14,7 +15,8 @@ import StringMatch.RabinKarp
       rabinKarpRoll,
       rabinKarpMatch,
       rabinKarp,
-      rabinKarpOnePass
+      rabinKarpOnePass,
+      seqRabinKarp
     )
 import StringMatch.Parallel (parRabinKarp4)
 
