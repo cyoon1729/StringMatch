@@ -8,6 +8,7 @@ module Lib
     , seqRabinKarp
     , parRabinKarp4
     , parRabinKarp
+    , parRabinKarp'
     ) where
 
 import StringMatch.Hash
@@ -22,7 +23,8 @@ import StringMatch.RabinKarp
 import StringMatch.Parallel
     (
       parRabinKarp4,
-      parRabinKarp
+      parRabinKarp,
+      parRabinKarp'
     )
 
 someFunc :: IO ()
