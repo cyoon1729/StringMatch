@@ -1,6 +1,7 @@
 module StringMatch.Parallel
     (
       parRabinKarp4
+    , parRabinKarpN
     , parRabinKarp
     , parRabinKarp'
     ) where
@@ -37,6 +38,22 @@ parRabinKarp4 pattern filePath = do
             _ <- rseq m3
             _ <- rseq m4
             return [(0, m1), (1, m2), (2, m3), (3, m4)]
+    let offsetCorrected = map (\(nChunk, idxs) -> map ((nChunk * chunkSize)+) (map fromIntegral idxs)) matches
+        matchesFinal    = map fromIntegral $ concat offsetCorrected
+    return matchesFinal
+
+parRabinKarpN :: [Char] -> [Char] -> Int -> IO [Int]
+parRabinKarpN pattern filePath n = do
+    fileSize <- getFileSize filePath
+    let chunkSize   = fromIntegral (fileSize `div` (fromIntegral n))
+        chunkOffset = (fileSize `div` (fromIntegral n)) :: FileOffset
+        nums  = map fromIntegral [0..(n-1)]
+        bnums = map fromIntegral [0..(n-1)]
+    chunks <- mapM (readChunk filePath chunkSize chunkOffset) nums
+    let matches = runEval $ do
+            let ms = (map (rabinKarp pattern) (map DBL.unpack chunks)) `using` parList rdeepseq
+                _ = mapM rseq ms
+            return $ zip bnums ms
     let offsetCorrected = map (\(nChunk, idxs) -> map ((nChunk * chunkSize)+) (map fromIntegral idxs)) matches
         matchesFinal    = map fromIntegral $ concat offsetCorrected
     return matchesFinal
