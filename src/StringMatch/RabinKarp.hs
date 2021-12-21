@@ -12,20 +12,23 @@ import qualified Data.Char as DC
 import qualified Data.List as DL
 import qualified Data.Set as DS
 import qualified Data.Map as DM
-
+import Data.Bits
 type HashValue = Int
 
 
--- | Modulo exponentiation, taken from https://gist.github.com/trevordixon/6788535
+-- | Modular exponentiation, taken from https://gist.github.com/trevordixon/6788535
 modExp :: Int -> Int -> Int -> Int
-modExp x y n = mod (x^(mod y (n-1))) (n)
+modExp b 0 m = 1
+modExp b e m = t * modExp ((b * b) `mod` m) (shiftR e 1) m `mod` m
+  where
+    t = if testBit e 0 then b `mod` m else 1
 
 
 -- | polynomial hash for rabin-karp hashing pattern
 polyHash :: Int -> Int -> [Char] -> HashValue
-polyHash b m str = foldl (\acc a -> polyMod a acc) 0 str
+polyHash b m str = foldl (\acc c -> polyMod c acc) 0 str
   where
-    polyMod a acc = modM $ (DC.ord a) + modM (acc * b)
+    polyMod c acc = modM $ (DC.ord c) + modM (acc * b)
     modM val      = val `mod` m
 
 
