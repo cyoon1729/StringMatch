@@ -1,7 +1,6 @@
 module Lib
     ( 
-      someFunc
-    , rabinKarpRoll
+      rabinKarpRoll
     , rabinKarpMatch
     , rabinKarp
     , rabinKarpOnePass
@@ -12,7 +11,6 @@ module Lib
     , parRabinKarp'
     ) where
 
-import StringMatch.Hash
 import StringMatch.RabinKarp
     (
       rabinKarpRoll,
@@ -28,6 +26,3 @@ import StringMatch.Parallel
       parRabinKarp,
       parRabinKarp'
     )
-
-someFunc :: IO ()
-someFunc = putStrLn $ unlines $ map show $ rollingHash "test" "--test-- test"

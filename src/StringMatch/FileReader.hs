@@ -3,8 +3,8 @@
 
 module StringMatch.FileReader
     (
-      readChunk,
-      getFileSize
+      readPartition
+    , getFileSize
     ) where
 
 import qualified Data.ByteString.Lazy as DBL
@@ -21,16 +21,18 @@ getFileSize path = do
     return (P.fileSize stat)
 
 
--- | Read `chunkNum`th chunk from a file.
-readChunk
-    :: FilePath
-    -> ByteCount
-    -> FileOffset
-    -> FileOffset
-    -> IO DBLC.ByteString
-readChunk filePath chunkSize chunkOffset chunkNum = do
-    let fileMode = Just (CMode 0440)
+-- | Read `partNum`th chunk from a file.
+readPartition :: FilePath -> Int -> Int -> Int -> IO DBLC.ByteString
+readPartition filePath numParts patternLength partNum = do
+    fileSize <- getFileSize filePath
+    let fileMode   = Just (CMode 0440)
+        partSize   = fileSize `div` (fromIntegral numParts)
+        partOffset = partSize * (fromIntegral partNum)
+        readSize   = if partNum == (numParts - 1) 
+                         then partSize 
+                         else partSize + fromIntegral (patternLength - 1)
+        readSizeB  = (fromIntegral readSize) :: ByteCount
     fd <- PIO.openFd filePath PIO.ReadOnly fileMode PIO.defaultFileFlags
-    chunk <- PIOB.fdPread fd chunkSize (chunkOffset * chunkNum)
+    chunk <- PIOB.fdPread fd readSizeB partOffset
     return chunk
 
