@@ -16,7 +16,7 @@ import System.IO(readFile, SeekMode(RelativeSeek))
 import qualified System.Directory as SD
 
 import StringMatch.RabinKarp (rabinKarpRoll, rabinKarpMatch, rabinKarp, rabinKarpOnePass)
-import StringMatch.FileReader (getFileSize, readChunk)
+import StringMatch.FileReader (getFileSize, readPartition)
 
 
 parRabinKarp4 :: [Char] -> [Char] -> IO [Int]
@@ -24,10 +24,11 @@ parRabinKarp4 pattern filePath = do
     fileSize <- getFileSize filePath
     let chunkSize   = fromIntegral (fileSize `div` 4) 
         chunkOffset = (fileSize `div` 4) :: FileOffset
-    chunk1 <- readChunk filePath chunkSize chunkOffset 0 
-    chunk2 <- readChunk filePath chunkSize chunkOffset 1
-    chunk3 <- readChunk filePath chunkSize chunkOffset 2
-    chunk4 <- readChunk filePath chunkSize chunkOffset 3
+        pattLen     = (fromIntegral $ length pattern)
+    chunk1 <- readPartition filePath 4 pattLen 0
+    chunk2 <- readPartition filePath 4 pattLen 1
+    chunk3 <- readPartition filePath 4 pattLen 2
+    chunk4 <- readPartition filePath 4 pattLen 3
     let matches = runEval $ do
             m1 <- rpar $ force (rabinKarp pattern (DBL.unpack chunk1))
             m2 <- rpar $ force (rabinKarp pattern (DBL.unpack chunk2))
@@ -42,21 +43,21 @@ parRabinKarp4 pattern filePath = do
         matchesFinal    = map fromIntegral $ concat offsetCorrected
     return matchesFinal
 
+
 parRabinKarpN :: [Char] -> [Char] -> Int -> IO [Int]
 parRabinKarpN pattern filePath n = do
     fileSize <- getFileSize filePath
-    let chunkSize   = fromIntegral (fileSize `div` (fromIntegral n))
-        chunkOffset = (fileSize `div` (fromIntegral n)) :: FileOffset
-        nums  = map fromIntegral [0..(n-1)]
-        bnums = map fromIntegral [0..(n-1)]
-    chunks <- mapM (readChunk filePath chunkSize chunkOffset) nums
-    let matches = runEval $ do
-            let ms = (map (rabinKarp pattern) (map DBL.unpack chunks)) `using` parList rdeepseq
+    partitions <- mapM (readPartition filePath n (length pattern)) [0..(n-1)]
+    let partsB = map DBL.unpack partitions
+        matches = runEval $ do
+            let ms = (map (rabinKarp pattern) partsB) `using` parList rdeepseq
                 _ = mapM rseq ms
-            return $ zip bnums ms
-    let offsetCorrected = map (\(nChunk, idxs) -> map ((nChunk * chunkSize)+) (map fromIntegral idxs)) matches
-        matchesFinal    = map fromIntegral $ concat offsetCorrected
-    return matchesFinal
+            return ms
+    let indicesByPart          = zip [0..(n-1)] $ map (map fromIntegral) matches 
+        partSize               = (fromIntegral fileSize) `div` n
+        applyOffset (np, idcs) = map (np * partSize +) idcs
+        offsetCorrected        = map applyOffset indicesByPart
+    return $ concat offsetCorrected
 
 
 parRabinKarp :: [Char] -> [Char] -> IO [Int]
