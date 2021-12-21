@@ -38,7 +38,7 @@ main = do
     -- let matches = rabinKarp pattern text
 
     -- matches <- seqRabinKarp pattern filePath
-    matches <- parRabinKarp4 pattern filePath
+    matches <- parRabinKarpN pattern filePath 4
     -- matches <- parRabinKarpN pattern filePath 32
     -- matches <- parRabinKarp pattern filePath
     -- matches <- parRabinKarp' pattern filePath
