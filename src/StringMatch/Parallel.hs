@@ -19,10 +19,10 @@ parRabinKarpN :: String -> String -> Int -> IO [Int]
 parRabinKarpN pattern filePath n = do
     fileSize <- getFileSize filePath
     partitions <- mapM (readPartition filePath n (length pattern)) [0..(n-1)]
-    let partsB = map DBL.unpack partitions
+    let partsB  = map DBL.unpack partitions
         matches = runEval $ do
             let ms = (map (rabinKarp pattern) partsB) `using` parList rdeepseq
-                _ = mapM rseq ms
+                _  = mapM rseq ms
             return ms
     let indicesByPart          = zip [0..(n-1)] $ map (map fromIntegral) matches 
         partSize               = (fromIntegral fileSize) `div` n
