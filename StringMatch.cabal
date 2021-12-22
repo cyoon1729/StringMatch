@@ -6,12 +6,12 @@ cabal-version: 1.12
 
 name:           StringMatch
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/StringMatch#readme>
-homepage:       https://github.com/githubuser/StringMatch#readme
-bug-reports:    https://github.com/githubuser/StringMatch/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2021 Author name here
+description:    Please see the README on GitHub at <https://github.com/cyoon1729/StringMatch>
+homepage:       https://github.com/cyoon1729/StringMatch#readme
+bug-reports:    https://github.com/cyoon1729/StringMatch/issues
+author:         Eumin Hong and Chris Yoon
+maintainer:     cjy2129@columbia.edu
+copyright:      2021 Chris Yoon
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -21,20 +21,30 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/StringMatch
+  location: https://github.com/cyoon1729/StringMatch
 
 library
   exposed-modules:
       Lib
-      StringMatch.Hash
+      StringMatch.FileReader
       StringMatch.Match
-      StringMatch.Reader
+      StringMatch.Parallel
+      StringMatch.RabinKarp
   other-modules:
       Paths_StringMatch
   hs-source-dirs:
       src
+  default-extensions:
+      PackageImports
   build-depends:
       base >=4.7 && <5
+    , bytestring
+    , containers
+    , deepseq
+    , directory
+    , parallel
+    , unix
+    , unix-bytestring
   default-language: Haskell2010
 
 executable StringMatch-exe
@@ -43,10 +53,19 @@ executable StringMatch-exe
       Paths_StringMatch
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  default-extensions:
+      PackageImports
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -eventlog
   build-depends:
       StringMatch
     , base >=4.7 && <5
+    , bytestring
+    , containers
+    , deepseq
+    , directory
+    , parallel
+    , unix
+    , unix-bytestring
   default-language: Haskell2010
 
 test-suite StringMatch-test
@@ -56,8 +75,17 @@ test-suite StringMatch-test
       Paths_StringMatch
   hs-source-dirs:
       test
+  default-extensions:
+      PackageImports
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       StringMatch
     , base >=4.7 && <5
+    , bytestring
+    , containers
+    , deepseq
+    , directory
+    , parallel
+    , unix
+    , unix-bytestring
   default-language: Haskell2010
