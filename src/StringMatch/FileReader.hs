@@ -1,3 +1,6 @@
+{-
+ - Implements lazy file partitioning and streaming
+-}
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 

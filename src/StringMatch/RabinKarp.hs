@@ -1,3 +1,7 @@
+{-
+ - Implements the Rabin-Karp algorithm for single and multiple
+   pattern matching
+-}
 module StringMatch.RabinKarp
     (
       rabinKarp

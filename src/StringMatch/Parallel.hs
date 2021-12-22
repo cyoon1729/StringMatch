@@ -1,3 +1,6 @@
+{-
+ - Implements parallelization of the Rabin-Karp algorithm
+-}
 module StringMatch.Parallel
     (
       parRabinKarpN
