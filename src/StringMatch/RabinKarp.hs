@@ -45,17 +45,18 @@ rabinKarpRoll text targetHash ws = roll text "" 0 0
       | targetHash == hashC = [(idx, subStr)]
       | otherwise      = []
     roll (x:xs) subStr hashC idx
-      | length subStr < ws = roll xs (subStr ++ [x]) hashC' idx 
-      | isMatch            = (fromIntegral idx, subStr) : roll xs (ss ++ [x]) hashR (idx + 1)
-      | otherwise          = roll xs (ss ++ [x]) hashR (idx + 1)
+      | isShorter = roll xs (subStr ++ [x]) hashC' idx 
+      | isMatch   = (idx, subStr) : roll xs (ss ++ [x]) hashR (idx + 1)
+      | otherwise = roll xs (ss ++ [x]) hashR (idx + 1)
       where
-        isMatch  = length subStr == ws && targetHash == hashC
-        hashC'   = modM $ ex + modM (hashC * b)
-        hashR    = modM $ ex + modM ((hashC - es * (modExp b (ws - 1) m)) * b)
-        modM val = val `mod` m
-        (s:ss)   = subStr
-        (ex, es) = (DC.ord x, DC.ord s)
-        (b, m)   = (31, 100003)
+        isShorter = length subStr < ws
+        isMatch   = length subStr == ws && targetHash == hashC
+        hashC'    = modM $ ex + modM (hashC * b)
+        hashR     = modM $ ex + modM ((hashC - es * (modExp b (ws - 1) m)) * b)
+        modM val  = val `mod` m
+        (s:ss)    = subStr
+        (ex, es)  = (DC.ord x, DC.ord s)
+        (b, m)    = (31, 100003)
 
 
 -- | Outputs indices that match pattern.
