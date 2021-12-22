@@ -6,6 +6,7 @@ module StringMatch.RabinKarp
     (
       rabinKarp
     , rabinKarpMulti
+    , rabinKarpOnePass
     )  where
 
 
@@ -118,3 +119,31 @@ rabinKarpMulti patterns text = rabinKarpMatchMulti patternSet candidates
     patternHashes = DS.fromList $ DL.map (polyHash 31 100003) patterns
     patternLength = length (head patterns)
 
+
+-- | Rabin-Karp in one pass.
+rabinKarpOnePass :: [Char] -> [Char] -> [Int]
+rabinKarpOnePass pattern text = rkRoll text "" 0 0
+  where
+    rkRoll [] subStr hashC idx
+      | pattern == subStr = [idx]
+      | otherwise         = []
+    rkRoll (x:xs) subStr hashC idx
+      | length subStr < ws = rkRoll xs (subStr ++ [x]) hashC' idx 
+      | hashMatch          = pattMatch 
+      | otherwise          = rkRoll xs (ss ++ [x]) hashR (idx + 1)
+      where
+        hashMatch = length subStr == ws && targetHash == hashC
+        pattMatch = 
+            case (pattern == subStr) of
+                True -> idx : rkRoll xs (ss ++ [x]) hashR (idx + 1)
+                False -> rkRoll xs (ss ++ [x]) hashR (idx + 1)
+        hashC'   = modM $ ex + modM (hashC * b)
+        hashR    = modM $ ex + modM ((hashC - es * (mExp b (ws - 1))) * b)
+        modM val = val `mod` m
+        mExp p q = modExp p q m
+        (s:ss)   = subStr
+        (ex, es) = (DC.ord x, DC.ord s)
+    targetHash = polyHash b m pattern
+    ws         = length pattern
+    (b, m)     = (31, 100003)
+ 
