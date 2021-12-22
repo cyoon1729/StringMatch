@@ -6,7 +6,6 @@ module StringMatch.RabinKarp
     (
       rabinKarp
     , rabinKarpMulti
-    , rabinKarpOnePass
     )  where
 
 
