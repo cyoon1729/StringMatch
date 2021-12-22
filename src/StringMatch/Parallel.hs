@@ -22,7 +22,6 @@ parRabinKarpN pattern filePath n = do
     let partsB  = map DBL.unpack partitions
         matches = runEval $ do
             let ms = (map (rabinKarp pattern) partsB) `using` parList rdeepseq
-                _  = mapM rseq ms
             return ms
     let indicesByPart          = zip [0..(n-1)] $ map (map fromIntegral) matches 
         partSize               = (fromIntegral fileSize) `div` n
